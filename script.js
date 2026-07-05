@@ -107,9 +107,9 @@ function renderCompanies() {
         <label class="company-title"><input type="checkbox" data-company="${company.slug}" ${selected.has(company.slug) ? 'checked' : ''}/><span><span class="company-name">${escapeHtml(company.name)}</span><br><span class="small">${escapeHtml(company.segment)}</span></span></label>
       </div>
       <div class="pills">
-        ${emails.length ? `<span class="pill good">${emails.length} suggested email${emails.length === 1 ? '' : 's'}</span>` : `<span class="pill warn">No direct email</span>`}
-        ${form ? `<span class="pill">Contact/source link</span>` : ''}
-        <span class="pill">${company.contacts.length} contact row${company.contacts.length === 1 ? '' : 's'}</span>
+        ${emails.length ? `<span class="pill good">${emails.length} public email contact${emails.length === 1 ? '' : 's'}</span>` : `<span class="pill warn">No direct public email</span>`}
+        ${form ? `<span class="pill">Company contact page</span>` : ''}
+        ${company.contacts.length > Math.max(emails.length, 1) ? `<span class="pill">More contact options</span>` : ''}
       </div>
       <p class="small">${emails.length ? escapeHtml(emails.join(', ')) : 'Use official contact/source links in the full directory below.'}</p>
     `;
@@ -141,8 +141,17 @@ function renderDetails() {
 
 function mailtoUrl(to, company) {
   const body = makeBody(els.templateSelect.value, company.name);
-  const params = new URLSearchParams({ subject: subject(company.name), body });
-  return `mailto:${encodeURIComponent(to)}?${params.toString()}`;
+  // Do not use URLSearchParams here. Some email clients display spaces from
+  // application/x-www-form-urlencoded query strings as literal plus signs.
+  // encodeURIComponent uses %20 for spaces, which mail clients handle more reliably.
+  const encodedTo = String(to || '')
+    .split(',')
+    .map(addr => encodeURIComponent(addr.trim()))
+    .filter(Boolean)
+    .join(',');
+  const encodedSubject = encodeURIComponent(subject(company.name));
+  const encodedBody = encodeURIComponent(body);
+  return `mailto:${encodedTo}?subject=${encodedSubject}&body=${encodedBody}`;
 }
 
 function renderDrafts() {
@@ -162,20 +171,20 @@ function renderDrafts() {
         <div class="draft-actions">
           <a class="button primary" href="${mailtoUrl(to, company)}">Open email draft</a>
           <button class="button secondary" data-copy-company="${company.slug}" type="button">Copy body</button>
-          ${form ? `<a class="button ghost" href="${escapeHtml(form)}" target="_blank" rel="noopener">Open source/contact page</a>` : ''}
+          ${form ? `<a class="button ghost" href="${escapeHtml(form)}" target="_blank" rel="noopener">Open company contact page</a>` : ''}
         </div>`;
     } else {
       formCount++;
       card.innerHTML = `<h3>${escapeHtml(company.name)}</h3>
         <p class="draft-to">No direct public email was listed for this company in the directory.</p>
         <div class="draft-actions">
-          ${form ? `<a class="button primary" href="${escapeHtml(form)}" target="_blank" rel="noopener">Open contact/source page</a>` : ''}
+          ${form ? `<a class="button primary" href="${escapeHtml(form)}" target="_blank" rel="noopener">Open company contact page</a>` : ''}
           <button class="button secondary" data-copy-company="${company.slug}" type="button">Copy body</button>
         </div>`;
     }
     els.drafts.appendChild(card);
   }
-  els.draftStats.textContent = selectedCompanies.length ? `${selectedCompanies.length} companies selected • ${emailDraftCount} email drafts • ${formCount} form/contact-page entries` : 'No companies selected yet.';
+  els.draftStats.textContent = selectedCompanies.length ? `${selectedCompanies.length} companies selected • ${emailDraftCount} email drafts • ${formCount} contact-page-only entries` : 'No companies selected yet.';
 }
 
 async function copyText(text) {
