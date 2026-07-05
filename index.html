@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AB 2047 3D Printing Outreach Tool</title>
+  <meta name="description" content="A static outreach tool for respectfully contacting 3D printing companies about California AB 2047." />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <p class="eyebrow">California AB 2047 • 3D printing outreach</p>
+        <h1>Ask 3D printing companies to speak up.</h1>
+        <p class="lead">Select companies, personalize a respectful message, and generate individual email drafts from your own email app. No backend, no tracking, no automated mass sending.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="#generator">Start outreach</a>
+          <a class="button ghost" href="https://leginfo.legislature.ca.gov/faces/billNavClient.xhtml?bill_id=202520260AB2047" target="_blank" rel="noopener">Official bill page</a>
+        </div>
+      </div>
+      <aside class="status-card" aria-labelledby="bill-status-title">
+        <h2 id="bill-status-title">Official bill snapshot</h2>
+        <dl>
+          <div><dt>Bill</dt><dd>AB 2047</dd></div>
+          <div><dt>Topic</dt><dd>Firearms: 3-dimensional printing blocking technology</dd></div>
+          <div><dt>Last amended</dt><dd>July 2, 2026</dd></div>
+          <div><dt>Location</dt><dd>Senate Appropriations</dd></div>
+          <div><dt>Status</dt><dd>Active bill — in committee process</dd></div>
+        </dl>
+        <p class="small">Snapshot checked against the California Legislative Information page on July 5, 2026. Always verify current status before publishing or sending.</p>
+      </aside>
+    </div>
+  </header>
+
+  <main>
+    <section class="wrap section" id="overview">
+      <div class="two-col">
+        <div>
+          <h2>What this page does</h2>
+          <p>This tool helps users contact public company email addresses or official contact forms, especially media, marketing, business, partner, sales, and general contacts. It is designed for civic outreach, not harassment or spam.</p>
+          <p>For best results, send to companies you use or care about, add a real personal note, and keep the tone respectful.</p>
+        </div>
+        <div class="notice">
+          <h3>Why individual emails?</h3>
+          <p>Individual drafts sent from a real person’s email account are more likely to be read than a giant CC/BCC blast. This page generates one draft per company whenever possible.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap section bill-summary" id="bill-summary">
+      <h2>AB 2047 summary</h2>
+      <p>As amended July 2, 2026, AB 2047 would require the California Department of Justice to publish guidance on firearm blueprint detection algorithms and software control processes. It would require 3D printer manufacturers that make printers available for sale or transfer in California to submit model-by-model attestations, and beginning December 1, 2029, would prohibit covered sales or transfers of listed noncompliant printers in California, subject to exceptions in the bill.</p>
+      <p class="small">This is a plain-language summary for outreach. It is not legal advice. Read the official bill text before relying on it.</p>
+    </section>
+
+    <section class="wrap section generator" id="generator">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Step 1</p>
+          <h2>Personalize the email</h2>
+        </div>
+        <button class="button secondary" id="resetForm" type="button">Reset</button>
+      </div>
+
+      <div class="form-grid">
+        <label>Name <input id="senderName" autocomplete="name" placeholder="Your name" /></label>
+        <label>City / state <input id="senderLocation" autocomplete="address-level2" placeholder="Medford, OR" /></label>
+        <label>Relationship to 3D printing
+          <select id="senderRole">
+            <option>3D printing hobbyist</option>
+            <option>Customer / printer owner</option>
+            <option>Maker / tinkerer</option>
+            <option>Educator</option>
+            <option>Makerspace member</option>
+            <option>Small business owner</option>
+            <option>Engineer / designer</option>
+            <option>Concerned member of the 3D printing community</option>
+          </select>
+        </label>
+        <label>Printer or company connection <input id="printerNote" placeholder="Example: I use a Bambu P1S and an Anycubic resin printer" /></label>
+      </div>
+      <label class="full-label">Personal note, optional
+        <textarea id="personalNote" rows="4" placeholder="Example: I use open-source slicers and I’m worried this bill could break legitimate workflows or create false positives for normal parts."></textarea>
+      </label>
+
+      <div class="template-row">
+        <label>Email template
+          <select id="templateSelect">
+            <option value="balanced">Balanced / general</option>
+            <option value="short">Short and direct</option>
+            <option value="technical">Technical concerns</option>
+          </select>
+        </label>
+        <label class="checkbox-line"><input type="checkbox" id="includeSupport" /> Include support/customer-service emails when better outreach contacts are unavailable</label>
+      </div>
+
+      <div class="preview-box">
+        <div class="section-head tight">
+          <h3>Message preview</h3>
+          <button class="button secondary" id="copyBody" type="button">Copy body</button>
+        </div>
+        <p><strong>Subject:</strong> <span id="subjectPreview"></span></p>
+        <pre id="bodyPreview"></pre>
+      </div>
+    </section>
+
+    <section class="wrap section" id="company-picker">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Step 2</p>
+          <h2>Select companies</h2>
+        </div>
+        <div class="picker-actions">
+          <button class="button secondary" id="selectRecommended" type="button">Select recommended</button>
+          <button class="button secondary" id="selectConsumer" type="button">Select consumer/prosumer</button>
+          <button class="button secondary" id="selectNone" type="button">Clear</button>
+        </div>
+      </div>
+      <div class="filters">
+        <label>Search <input id="searchBox" placeholder="Bambu, Creality, resin, industrial…" /></label>
+        <label>Segment
+          <select id="segmentFilter"><option value="">All segments</option></select>
+        </label>
+        <label>Contact type
+          <select id="contactFilter">
+            <option value="">All companies</option>
+            <option value="email">Direct email available</option>
+            <option value="form">Form/contact page only or also available</option>
+          </select>
+        </label>
+      </div>
+      <p class="small"><span id="visibleCount"></span> shown • <span id="selectedCount">0</span> selected</p>
+      <div id="companyList" class="company-list"></div>
+    </section>
+
+    <section class="wrap section" id="generated">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Step 3</p>
+          <h2>Generate drafts</h2>
+        </div>
+        <button class="button primary" id="generateDrafts" type="button">Generate selected drafts</button>
+      </div>
+      <div class="notice warning">
+        <strong>Recommended:</strong> Open and send emails one company at a time. Add a sentence about why that company matters to you. Do not threaten, harass, or flood inboxes.
+      </div>
+      <div id="draftStats" class="draft-stats"></div>
+      <div id="drafts" class="drafts"></div>
+    </section>
+
+    <section class="wrap section" id="details">
+      <h2>Full contact directory</h2>
+      <p>These entries come from the companion contact directory and include source links. Contact details can change; verify before major outreach.</p>
+      <div id="contactDetails" class="details"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <p>Static GitHub Pages outreach tool. Source data generated from public company contact pages and official resources. No visitor data is collected by this page.</p>
+    </div>
+  </footer>
+
+  <script src="contacts.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
