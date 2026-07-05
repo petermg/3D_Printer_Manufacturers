@@ -71,6 +71,14 @@ function contactFormUrl(company) {
   return row ? row.sourceUrl : '';
 }
 
+function companyDetailId(company) {
+  return `contact-details-${company.slug}`;
+}
+
+function emailLinks(emails, company) {
+  return emails.map(email => `<a href="${mailtoUrl(email, company)}" title="Open an email draft to ${escapeHtml(email)}">${escapeHtml(email)}</a>`).join(', ');
+}
+
 function renderSegments() {
   const segs = [...new Set(contacts.map(c => c.segment).filter(Boolean))].sort();
   for (const seg of segs) {
@@ -102,16 +110,17 @@ function renderCompanies() {
     const form = contactFormUrl(company);
     const card = document.createElement('article');
     card.className = 'company-card';
+    const moreContacts = company.contacts.length > Math.max(emails.length, 1);
     card.innerHTML = `
       <div class="company-top">
         <label class="company-title"><input type="checkbox" data-company="${company.slug}" ${selected.has(company.slug) ? 'checked' : ''}/><span><span class="company-name">${escapeHtml(company.name)}</span><br><span class="small">${escapeHtml(company.segment)}</span></span></label>
       </div>
       <div class="pills">
-        ${emails.length ? `<span class="pill good">${emails.length} public email contact${emails.length === 1 ? '' : 's'}</span>` : `<span class="pill warn">No direct public email</span>`}
-        ${form ? `<span class="pill">Company contact page</span>` : ''}
-        ${company.contacts.length > Math.max(emails.length, 1) ? `<span class="pill">More contact options</span>` : ''}
+        ${emails.length ? `<a class="pill good pill-link" href="${mailtoUrl(emails.join(','), company)}" title="Open an email draft to the public email contact${emails.length === 1 ? '' : 's'} shown for ${escapeHtml(company.name)}">${emails.length} public email contact${emails.length === 1 ? '' : 's'}</a>` : `<span class="pill warn">No direct public email</span>`}
+        ${form ? `<a class="pill pill-link" href="${escapeHtml(form)}" target="_blank" rel="noopener" title="Open ${escapeHtml(company.name)} contact/source page">Company contact page</a>` : ''}
+        ${moreContacts ? `<a class="pill pill-link" href="#${companyDetailId(company)}" title="Jump to the full directory entry for ${escapeHtml(company.name)}">More contact options</a>` : ''}
       </div>
-      <p class="small">${emails.length ? escapeHtml(emails.join(', ')) : 'Use official contact/source links in the full directory below.'}</p>
+      <p class="small">${emails.length ? emailLinks(emails, company) : `Use official contact/source links in the <a href="#${companyDetailId(company)}">full directory below</a>.`}</p>
     `;
     els.companyList.appendChild(card);
   });
@@ -123,6 +132,7 @@ function renderDetails() {
   els.contactDetails.innerHTML = '';
   for (const company of contacts) {
     const d = document.createElement('details');
+    d.id = companyDetailId(company);
     d.innerHTML = `<summary>${escapeHtml(company.name)} <span class="small">— ${escapeHtml(company.segment)}</span></summary>
       <table>
         <thead><tr><th>Department</th><th>Email(s)</th><th>Phone / other</th><th>Region</th><th>Notes</th><th>Source</th></tr></thead>
@@ -218,6 +228,14 @@ function initEvents() {
     if (!cb) return;
     cb.checked ? selected.add(cb.dataset.company) : selected.delete(cb.dataset.company);
     els.selectedCount.textContent = selected.size;
+  });
+  els.companyList.addEventListener('click', (e) => {
+    const detailsLink = e.target.closest('a[href^="#contact-details-"]');
+    if (!detailsLink) return;
+    const detail = document.querySelector(detailsLink.getAttribute('href'));
+    if (detail && detail.tagName.toLowerCase() === 'details') {
+      detail.open = true;
+    }
   });
   $('selectNone').addEventListener('click', () => { selected.clear(); renderCompanies(); });
   $('selectRecommended').addEventListener('click', () => {
