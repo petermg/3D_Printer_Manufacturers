@@ -154,6 +154,14 @@ function mailtoUrl(to, company) {
   return `mailto:${encodedTo}?subject=${encodedSubject}&body=${encodedBody}`;
 }
 
+function gmailComposeUrl(to, company) {
+  const body = makeBody(els.templateSelect.value, company.name);
+  const encodedTo = encodeURIComponent(String(to || '').split(',').map(addr => addr.trim()).filter(Boolean).join(','));
+  const encodedSubject = encodeURIComponent(subject(company.name));
+  const encodedBody = encodeURIComponent(body);
+  return `https://mail.google.com/mail/?view=cm&fs=1&to=${encodedTo}&su=${encodedSubject}&body=${encodedBody}`;
+}
+
 function renderDrafts() {
   els.drafts.innerHTML = '';
   const selectedCompanies = contacts.filter(c => selected.has(c.slug));
@@ -169,7 +177,8 @@ function renderDrafts() {
       card.innerHTML = `<h3>${escapeHtml(company.name)}</h3>
         <p class="draft-to"><strong>To:</strong> ${escapeHtml(to)}</p>
         <div class="draft-actions">
-          <a class="button primary" href="${mailtoUrl(to, company)}">Open email draft</a>
+          <a class="button primary" href="${mailtoUrl(to, company)}">Open email app draft</a>
+          <a class="button secondary" href="${gmailComposeUrl(to, company)}" target="_blank" rel="noopener">Open Gmail draft</a>
           <button class="button secondary" data-copy-company="${company.slug}" type="button">Copy body</button>
           ${form ? `<a class="button ghost" href="${escapeHtml(form)}" target="_blank" rel="noopener">Open company contact page</a>` : ''}
         </div>`;

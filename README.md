@@ -7,7 +7,7 @@ A ready-to-host static GitHub Pages site for helping people respectfully contact
 - Shows a plain-language AB 2047 summary with a link to the official California bill page.
 - Lets visitors personalize an outreach email.
 - Lets visitors select 3D printing companies from a searchable checklist.
-- Generates individual `mailto:` drafts from the visitor’s own email app.
+- Generates individual `mailto:` drafts from the visitor’s own email app and optional Gmail web compose links.
 - Provides contact/source links for companies that do not publish direct public emails.
 - Includes the full contact directory with source links.
 
@@ -34,7 +34,7 @@ https://YOUR-USERNAME.github.io/YOUR-REPO-NAME/
 
 - `index.html` — the static page.
 - `style.css` — styling.
-- `script.js` — checklist, filters, template preview, and `mailto:` generation.
+- `script.js` — checklist, filters, template preview, `mailto:` generation, and Gmail compose links.
 - `contacts.js` — company contact data generated from the contact directory.
 - `contacts.csv` — plain CSV export of the same contact directory.
 - `sources.md` — bill and data source notes.
