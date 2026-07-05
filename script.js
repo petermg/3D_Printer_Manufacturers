@@ -7,7 +7,8 @@ const els = {
   includeSupport: $('includeSupport'), subjectPreview: $('subjectPreview'), bodyPreview: $('bodyPreview'),
   companyList: $('companyList'), segmentFilter: $('segmentFilter'), contactFilter: $('contactFilter'),
   searchBox: $('searchBox'), visibleCount: $('visibleCount'), selectedCount: $('selectedCount'),
-  drafts: $('drafts'), draftStats: $('draftStats'), contactDetails: $('contactDetails')
+  drafts: $('drafts'), draftStats: $('draftStats'), contactDetails: $('contactDetails'),
+  shareText: $('shareText'), copyShare: $('copyShare'), nativeShare: $('nativeShare')
 };
 
 const selected = new Set();
@@ -188,7 +189,7 @@ function renderDrafts() {
         <p class="draft-to"><strong>To:</strong> ${escapeHtml(to)}</p>
         <div class="draft-actions">
           <a class="button primary" href="${mailtoUrl(to, company)}">Open email app draft</a>
-          <a class="button secondary" href="${gmailComposeUrl(to, company)}" target="_blank" rel="noopener">Open Gmail draft</a>
+          <a class="button gmail" href="${gmailComposeUrl(to, company)}" target="_blank" rel="noopener">Open Gmail draft</a>
           <button class="button secondary" data-copy-company="${company.slug}" type="button">Copy body</button>
           ${form ? `<a class="button ghost" href="${escapeHtml(form)}" target="_blank" rel="noopener">Open company contact page</a>` : ''}
         </div>`;
@@ -216,6 +217,29 @@ async function copyText(text) {
     document.execCommand('copy'); document.body.removeChild(ta);
     return true;
   }
+}
+
+
+function pageUrl() {
+  const fallback = 'https://petermg.github.io/3D_Printer_Manufacturers/';
+  if (!window.location || window.location.protocol === 'file:') return fallback;
+  return window.location.href.split('#')[0];
+}
+
+function makeShareText() {
+  return `California AB 2047 could require 3D printers sold/transferred in California to include firearm blueprint detection/blocking technology. That could affect legitimate users, open slicers, firmware, local/offline workflows, costs, and printer availability.
+
+This page helps users respectfully contact 3D printer companies and ask them to speak up:
+
+${pageUrl()}
+
+Official bill page:
+https://leginfo.legislature.ca.gov/faces/billNavClient.xhtml?bill_id=202520260AB2047`;
+}
+
+function updateShareText() {
+  if (els.shareText) els.shareText.value = makeShareText();
+  if (els.nativeShare && !navigator.share) els.nativeShare.classList.add('hidden');
 }
 
 function initEvents() {
@@ -258,6 +282,26 @@ function initEvents() {
     await copyText(makeBody(els.templateSelect.value, company ? company.name : '[Company]'));
     btn.textContent = 'Copied'; setTimeout(() => btn.textContent = 'Copy body', 1100);
   });
+  if (els.copyShare) {
+    els.copyShare.addEventListener('click', async () => {
+      await copyText(makeShareText());
+      els.copyShare.textContent = 'Copied'; setTimeout(() => els.copyShare.textContent = 'Copy share text', 1100);
+    });
+  }
+  if (els.nativeShare) {
+    els.nativeShare.addEventListener('click', async () => {
+      if (!navigator.share) return;
+      try {
+        await navigator.share({
+          title: 'AB 2047 3D Printing Outreach Tool',
+          text: 'Help 3D printing users respectfully contact companies about California AB 2047.',
+          url: pageUrl()
+        });
+      } catch (e) {
+        // User canceled or the browser refused the share action. No action needed.
+      }
+    });
+  }
   $('resetForm').addEventListener('click', () => {
     els.senderName.value = ''; els.senderLocation.value = ''; els.senderRole.selectedIndex = 0;
     els.printerNote.value = ''; els.personalNote.value = ''; els.templateSelect.value = 'balanced';
@@ -266,6 +310,7 @@ function initEvents() {
 }
 
 renderSegments();
+updateShareText();
 renderDetails();
 updatePreview();
 renderCompanies();

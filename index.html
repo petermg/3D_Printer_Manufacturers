@@ -54,6 +54,24 @@
       <p class="small">This is a plain-language summary for outreach. It is not legal advice. Read the official bill text before relying on it.</p>
     </section>
 
+
+    <section class="wrap section share-section" id="share">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Share</p>
+          <h2>Share this resource</h2>
+        </div>
+        <div class="share-actions">
+          <button class="button secondary" id="copyShare" type="button">Copy share text</button>
+          <button class="button ghost" id="nativeShare" type="button">Share page</button>
+        </div>
+      </div>
+      <div class="notice">
+        <p>Copy this short message into Reddit, Discord, Facebook groups, forums, YouTube comments, or anywhere 3D printing users gather.</p>
+        <textarea id="shareText" class="share-text" rows="8" readonly>Loading share text...</textarea>
+      </div>
+    </section>
+
     <section class="wrap section generator" id="generator">
       <div class="section-head">
         <div>
@@ -65,7 +83,7 @@
 
       <div class="form-grid">
         <label>Name <input id="senderName" autocomplete="name" placeholder="Your name" /></label>
-        <label>City / state <input id="senderLocation" autocomplete="address-level2" placeholder="La Habra, CA" /></label>
+        <label>City / state <input id="senderLocation" autocomplete="address-level2" placeholder="Medford, OR" /></label>
         <label>Relationship to 3D printing
           <select id="senderRole">
             <option>3D printing hobbyist</option>
