@@ -8,7 +8,8 @@ A ready-to-host static GitHub Pages site for helping people respectfully contact
 - Lets visitors personalize an outreach email.
 - Provides copy/paste share text for Reddit, Discord, forums, and social posts.
 - Lets visitors select 3D printing companies from a searchable checklist.
-- Generates individual `mailto:` drafts from the visitor’s own email app and optional Gmail web compose links.
+- Generates individual drafts from the visitor’s own email app or Gmail web compose links.
+- Provides an email-method chooser for quick company-card links, so users can choose Email App or Gmail at the moment they click.
 - Provides contact/source links for companies that do not publish direct public emails.
 - Includes the full contact directory with source links.
 
@@ -35,7 +36,7 @@ https://YOUR-USERNAME.github.io/YOUR-REPO-NAME/
 
 - `index.html` — the static page.
 - `style.css` — styling.
-- `script.js` — checklist, filters, template preview, share-text copy button, `mailto:` generation, and Gmail compose links.
+- `script.js` — checklist, filters, template preview, share-text copy button, email-method chooser, `mailto:` generation, and Gmail compose links.
 - `contacts.js` — company contact data generated from the contact directory.
 - `contacts.csv` — plain CSV export of the same contact directory.
 - `sources.md` — bill and data source notes.

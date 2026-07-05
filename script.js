@@ -12,6 +12,7 @@ const els = {
 };
 
 const selected = new Set();
+let pendingEmailChoice = null;
 const consumerNames = ['Bambu Lab','Creality','Anycubic','Prusa Research','ELEGOO','Flashforge','QIDI Tech','FLSUN','Sovol','Snapmaker','Raise3D','Phrozen','Peopoly','UniFormation','HeyGears','MINGDA','LulzBot','BCN3D','eufyMake / AnkerMake','Artillery3D','Tronxy','Kingroon','Voxelab'];
 
 const recommendedNames = ['Bambu Lab','Creality','Anycubic','Prusa Research','ELEGOO','Flashforge','QIDI Tech','FLSUN','Sovol','Snapmaker','Raise3D','Phrozen','Formlabs','UltiMaker','Markforged','Stratasys','3D Systems','HP 3D Printing','Nano Dimension / Desktop Metal','Nexa3D','Carbon'];
@@ -77,7 +78,7 @@ function companyDetailId(company) {
 }
 
 function emailLinks(emails, company) {
-  return emails.map(email => `<a href="${mailtoUrl(email, company)}" title="Open an email draft to ${escapeHtml(email)}">${escapeHtml(email)}</a>`).join(', ');
+  return emails.map(email => `<button class="inline-email" type="button" data-email-to="${escapeHtml(email)}" data-company-slug="${escapeHtml(company.slug)}" title="Choose email app or Gmail for ${escapeHtml(email)}">${escapeHtml(email)}</button>`).join(', ');
 }
 
 function renderSegments() {
@@ -117,11 +118,11 @@ function renderCompanies() {
         <label class="company-title"><input type="checkbox" data-company="${company.slug}" ${selected.has(company.slug) ? 'checked' : ''}/><span><span class="company-name">${escapeHtml(company.name)}</span><br><span class="small">${escapeHtml(company.segment)}</span></span></label>
       </div>
       <div class="pills">
-        ${emails.length ? `<a class="pill good pill-link" href="${mailtoUrl(emails.join(','), company)}" title="Open an email draft to the public email contact${emails.length === 1 ? '' : 's'} shown for ${escapeHtml(company.name)}">${emails.length} public email contact${emails.length === 1 ? '' : 's'}</a>` : `<span class="pill warn">No direct public email</span>`}
+        ${emails.length ? `<button class="pill good pill-button" type="button" data-email-to="${escapeHtml(emails.join(','))}" data-company-slug="${escapeHtml(company.slug)}" title="Choose email app or Gmail for ${escapeHtml(company.name)}">Email this company</button>` : `<span class="pill warn">No direct public email</span>`}
         ${form ? `<a class="pill pill-link" href="${escapeHtml(form)}" target="_blank" rel="noopener" title="Open ${escapeHtml(company.name)} contact/source page">Company contact page</a>` : ''}
         ${moreContacts ? `<a class="pill pill-link" href="#${companyDetailId(company)}" title="Jump to the full directory entry for ${escapeHtml(company.name)}">More contact options</a>` : ''}
       </div>
-      <p class="small">${emails.length ? emailLinks(emails, company) : `Use official contact/source links in the <a href="#${companyDetailId(company)}">full directory below</a>.`}</p>
+      <p class="small">${emails.length ? `<strong>Public email contacts:</strong> ${emailLinks(emails, company)}` : `Use official contact/source links in the <a href="#${companyDetailId(company)}">full directory below</a>.`}</p>
     `;
     els.companyList.appendChild(card);
   });
@@ -171,6 +172,74 @@ function gmailComposeUrl(to, company) {
   const encodedSubject = encodeURIComponent(subject(company.name));
   const encodedBody = encodeURIComponent(body);
   return `https://mail.google.com/mail/?view=cm&fs=1&to=${encodedTo}&su=${encodedSubject}&body=${encodedBody}`;
+}
+
+
+function ensureEmailChooser() {
+  let modal = $('emailChoiceModal');
+  if (modal) return modal;
+  modal = document.createElement('div');
+  modal.id = 'emailChoiceModal';
+  modal.className = 'email-modal hidden';
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-modal', 'true');
+  modal.setAttribute('aria-labelledby', 'emailChoiceTitle');
+  modal.innerHTML = `
+    <div class="email-modal-backdrop" data-close-email-modal="true"></div>
+    <div class="email-modal-card">
+      <div class="email-modal-head">
+        <div>
+          <p class="eyebrow">Choose email method</p>
+          <h2 id="emailChoiceTitle">Open draft</h2>
+        </div>
+        <button class="modal-close" type="button" data-close-email-modal="true" aria-label="Close">×</button>
+      </div>
+      <p id="emailChoiceIntro" class="small"></p>
+      <div class="email-choice-recipients" id="emailChoiceRecipients"></div>
+      <div class="draft-actions email-choice-actions">
+        <a class="button primary" id="emailChoiceApp" href="#">Open email app draft</a>
+        <a class="button gmail" id="emailChoiceGmail" href="#" target="_blank" rel="noopener">Open Gmail draft</a>
+        <button class="button secondary" id="emailChoiceCopy" type="button">Copy email address</button>
+      </div>
+      <p class="small">The draft uses the message and template currently shown on this page. Nothing is sent automatically.</p>
+    </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click', async (e) => {
+    if (e.target.closest('[data-close-email-modal]')) closeEmailChooser();
+    const copyButton = e.target.closest('#emailChoiceCopy');
+    if (copyButton && pendingEmailChoice) {
+      await copyText(pendingEmailChoice.to);
+      copyButton.textContent = 'Copied';
+      setTimeout(() => { copyButton.textContent = pendingEmailChoice && pendingEmailChoice.to.includes(',') ? 'Copy email addresses' : 'Copy email address'; }, 1100);
+    }
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !modal.classList.contains('hidden')) closeEmailChooser();
+  });
+  return modal;
+}
+
+function openEmailChooser(to, company) {
+  const modal = ensureEmailChooser();
+  pendingEmailChoice = { to, company };
+  const recipients = String(to || '').split(',').map(addr => addr.trim()).filter(Boolean);
+  $('emailChoiceTitle').textContent = `Open draft for ${company.name}`;
+  $('emailChoiceIntro').textContent = recipients.length > 1
+    ? `This will address the draft to ${recipients.length} public email contacts for ${company.name}. Choose the option that matches how you use email.`
+    : `This will address the draft to the public email contact shown for ${company.name}. Choose the option that matches how you use email.`;
+  $('emailChoiceRecipients').innerHTML = `<strong>To:</strong><br>${recipients.map(escapeHtml).join('<br>')}`;
+  $('emailChoiceApp').href = mailtoUrl(to, company);
+  $('emailChoiceGmail').href = gmailComposeUrl(to, company);
+  $('emailChoiceCopy').textContent = recipients.length > 1 ? 'Copy email addresses' : 'Copy email address';
+  modal.classList.remove('hidden');
+  document.body.classList.add('modal-open');
+  setTimeout(() => $('emailChoiceGmail').focus(), 0);
+}
+
+function closeEmailChooser() {
+  const modal = $('emailChoiceModal');
+  if (modal) modal.classList.add('hidden');
+  document.body.classList.remove('modal-open');
 }
 
 function renderDrafts() {
@@ -254,6 +323,13 @@ function initEvents() {
     els.selectedCount.textContent = selected.size;
   });
   els.companyList.addEventListener('click', (e) => {
+    const emailTrigger = e.target.closest('[data-email-to][data-company-slug]');
+    if (emailTrigger) {
+      e.preventDefault();
+      const company = contacts.find(c => c.slug === emailTrigger.dataset.companySlug);
+      if (company) openEmailChooser(emailTrigger.dataset.emailTo, company);
+      return;
+    }
     const detailsLink = e.target.closest('a[href^="#contact-details-"]');
     if (!detailsLink) return;
     const detail = document.querySelector(detailsLink.getAttribute('href'));

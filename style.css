@@ -132,3 +132,87 @@ th { color: var(--accent); }
   .hero-grid, .two-col, .form-grid, .filters, .company-list { grid-template-columns: 1fr; }
   .section-head { align-items: start; flex-direction: column; }
 }
+
+/* Email-method chooser for quick company-card links */
+button.pill {
+  font: inherit;
+  background: transparent;
+  cursor: default;
+}
+.pill-button {
+  cursor: pointer;
+}
+.pill-button:hover, .pill-button:focus {
+  filter: brightness(1.18);
+  background: rgba(255,255,255,0.07);
+  outline: none;
+}
+.inline-email {
+  display: inline;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--accent-2);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.inline-email:hover, .inline-email:focus {
+  color: #bdeaff;
+  outline: none;
+}
+.email-modal.hidden { display: none; }
+.email-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+.email-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.68);
+  backdrop-filter: blur(5px);
+}
+.email-modal-card {
+  position: relative;
+  width: min(680px, 100%);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+  padding: 22px;
+}
+.email-modal-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: start;
+}
+.email-modal-head h2 { margin-bottom: 6px; }
+.modal-close {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.07);
+  color: var(--text);
+  font: inherit;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.modal-close:hover, .modal-close:focus { filter: brightness(1.12); }
+.email-choice-recipients {
+  margin: 14px 0;
+  padding: 14px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: rgba(0,0,0,0.22);
+  color: var(--muted);
+  word-break: break-word;
+}
+.email-choice-actions { margin: 16px 0 12px; }
+body.modal-open { overflow: hidden; }
