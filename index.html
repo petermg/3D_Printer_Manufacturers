@@ -198,10 +198,12 @@
         // Match the same path GoatCounter records in the dashboard.
         var path = window.goatcounter.get_data().p;
 
-        var response = await fetch(
-          'https://petermg.goatcounter.com/counter/' + encodeURIComponent(path) + '.json',
-          { cache: 'no-store' }
-        );
+        // Add a cache-buster so the public counter endpoint is less likely
+        // to return an older browser/CDN-cached response while the dashboard is newer.
+        var counterUrl =
+          'https://petermg.goatcounter.com/counter/' + encodeURIComponent(path) + '.json?v=' + Date.now();
+
+        var response = await fetch(counterUrl, { cache: 'no-store' });
 
         if (!response.ok) return;
 
