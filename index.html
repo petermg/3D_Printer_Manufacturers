@@ -189,31 +189,65 @@
 
   <!-- Optional public page-view counter powered by GoatCounter.
        This uses GoatCounter's JSON counter endpoint so the site controls the styling.
-       Note: GoatCounter public counter responses may be cached for several hours. -->
+       It tries the exact GoatCounter path and the with/without-trailing-slash variants,
+       then displays the highest returned count. This avoids a common GitHub Pages
+       ambiguity where /repo and /repo/ can be counted as different paths. -->
   <script>
+    function parseGoatCount(value) {
+      var n = parseInt(String(value || '').replace(/[^0-9]/g, ''), 10);
+      return Number.isFinite(n) ? n : -1;
+    }
+
+    async function fetchGoatCounterPath(path) {
+      var url = 'https://petermg.goatcounter.com/counter/' +
+        encodeURIComponent(path) + '.json?v=' + Date.now();
+
+      var response = await fetch(url, { cache: 'no-store' });
+      if (!response.ok) return null;
+
+      var data = await response.json();
+      if (!data || typeof data.count === 'undefined') return null;
+
+      return {
+        path: path,
+        countText: data.count,
+        countNumber: parseGoatCount(data.count)
+      };
+    }
+
     async function showGoatCounter() {
       if (!window.goatcounter || !window.goatcounter.get_data) return;
 
       try {
-        // Match the same path GoatCounter records in the dashboard.
-        var path = window.goatcounter.get_data().p;
+        var detectedPath = window.goatcounter.get_data().p || location.pathname;
+        var paths = [detectedPath];
 
-        // Add a cache-buster so the public counter endpoint is less likely
-        // to return an older browser/CDN-cached response while the dashboard is newer.
-        var counterUrl =
-          'https://petermg.goatcounter.com/counter/' + encodeURIComponent(path) + '.json?v=' + Date.now();
+        if (detectedPath.endsWith('/')) {
+          paths.push(detectedPath.replace(/\/+$/, ''));
+        } else {
+          paths.push(detectedPath + '/');
+        }
 
-        var response = await fetch(counterUrl, { cache: 'no-store' });
+        // Keep only unique, non-empty paths.
+        paths = [...new Set(paths.filter(Boolean))];
 
-        if (!response.ok) return;
+        var results = await Promise.all(paths.map(function(path) {
+          return fetchGoatCounterPath(path).catch(function() { return null; });
+        }));
 
-        var data = await response.json();
-        if (!data || typeof data.count === 'undefined') return;
+        results = results.filter(Boolean);
+        if (!results.length) return;
+
+        // Use the highest count. For this one-page GitHub Pages site, this is
+        // the most user-friendly way to handle slash/no-slash path differences.
+        var best = results.reduce(function(a, b) {
+          return b.countNumber > a.countNumber ? b : a;
+        });
 
         var countTarget = document.getElementById('visitorCount');
         var section = document.getElementById('visitorCounterSection');
 
-        if (countTarget) countTarget.textContent = data.count;
+        if (countTarget) countTarget.textContent = best.countText;
         if (section) {
           section.hidden = false;
           section.title = 'Public counter may lag behind the GoatCounter dashboard because GoatCounter caches counter responses.';
