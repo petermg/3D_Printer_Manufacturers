@@ -232,3 +232,16 @@ button.pill {
 }
 .email-choice-actions { margin: 16px 0 12px; }
 body.modal-open { overflow: hidden; }
+
+
+/* Temporary GoatCounter diagnostic counter text. */
+.visitor-count-diagnostic {
+  margin-top: 0.4rem;
+}
+
+.visitor-count-note {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.82rem;
+  margin: 0.4rem 0 0;
+}

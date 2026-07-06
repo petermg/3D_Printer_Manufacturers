@@ -175,7 +175,9 @@
   </main>
 
   <section class="wrap visitor-count-section" id="visitorCounterSection" aria-label="Site page view count" hidden>
-    <p class="visitor-count">Page views, updated periodically: <span id="visitorCount"></span></p>
+    <p class="visitor-count">JSON page views: <span id="visitorCount"></span></p>
+    <p class="visitor-count visitor-count-diagnostic">GoatCounter badge: <span id="visitorBadge"></span></p>
+    <p class="visitor-count-note">Diagnostic mode: if both counters lag, GoatCounter is likely caching the public counter. If only one lags, the issue is probably path or counter-method related.</p>
   </section>
 
   <footer class="footer">
@@ -187,73 +189,57 @@
   <script src="contacts.js"></script>
   <script src="script.js"></script>
 
-  <!-- Optional public page-view counter powered by GoatCounter.
-       This uses GoatCounter's JSON counter endpoint so the site controls the styling.
-       It tries the exact GoatCounter path and the with/without-trailing-slash variants,
-       then displays the highest returned count. This avoids a common GitHub Pages
-       ambiguity where /repo and /repo/ can be counted as different paths. -->
+  <!-- Diagnostic public page-view counters powered by GoatCounter.
+       Shows both the JSON count and GoatCounter's built-in HTML badge side-by-side.
+       Use temporarily for troubleshooting, then remove the badge once the path/cache issue is understood. -->
   <script>
-    function parseGoatCount(value) {
-      var n = parseInt(String(value || '').replace(/[^0-9]/g, ''), 10);
-      return Number.isFinite(n) ? n : -1;
-    }
-
-    async function fetchGoatCounterPath(path) {
-      var url = 'https://petermg.goatcounter.com/counter/' +
-        encodeURIComponent(path) + '.json?v=' + Date.now();
-
-      var response = await fetch(url, { cache: 'no-store' });
-      if (!response.ok) return null;
-
-      var data = await response.json();
-      if (!data || typeof data.count === 'undefined') return null;
-
-      return {
-        path: path,
-        countText: data.count,
-        countNumber: parseGoatCount(data.count)
-      };
-    }
-
     async function showGoatCounter() {
       if (!window.goatcounter || !window.goatcounter.get_data) return;
 
+      var section = document.getElementById('visitorCounterSection');
+      if (section) {
+        section.hidden = false;
+        section.title = 'Diagnostic mode: compares GoatCounter JSON count against GoatCounter built-in badge count.';
+      }
+
+      var path;
       try {
-        var detectedPath = window.goatcounter.get_data().p || location.pathname;
-        var paths = [detectedPath];
+        // Exact path GoatCounter records for this page.
+        path = window.goatcounter.get_data().p;
+      } catch (error) {
+        path = window.location.pathname;
+      }
 
-        if (detectedPath.endsWith('/')) {
-          paths.push(detectedPath.replace(/\/+$/, ''));
-        } else {
-          paths.push(detectedPath + '/');
-        }
+      // 1) JSON counter: site-controlled styling.
+      try {
+        var counterUrl =
+          'https://petermg.goatcounter.com/counter/' + encodeURIComponent(path) + '.json?v=' + Date.now();
 
-        // Keep only unique, non-empty paths.
-        paths = [...new Set(paths.filter(Boolean))];
-
-        var results = await Promise.all(paths.map(function(path) {
-          return fetchGoatCounterPath(path).catch(function() { return null; });
-        }));
-
-        results = results.filter(Boolean);
-        if (!results.length) return;
-
-        // Use the highest count. For this one-page GitHub Pages site, this is
-        // the most user-friendly way to handle slash/no-slash path differences.
-        var best = results.reduce(function(a, b) {
-          return b.countNumber > a.countNumber ? b : a;
-        });
-
-        var countTarget = document.getElementById('visitorCount');
-        var section = document.getElementById('visitorCounterSection');
-
-        if (countTarget) countTarget.textContent = best.countText;
-        if (section) {
-          section.hidden = false;
-          section.title = 'Public counter may lag behind the GoatCounter dashboard because GoatCounter caches counter responses.';
+        var response = await fetch(counterUrl, { cache: 'no-store' });
+        if (response.ok) {
+          var data = await response.json();
+          if (data && typeof data.count !== 'undefined') {
+            var countTarget = document.getElementById('visitorCount');
+            if (countTarget) countTarget.textContent = data.count;
+          }
         }
       } catch (error) {
-        // Fail silently. The counter is optional and should never make the page look broken.
+        var countTarget = document.getElementById('visitorCount');
+        if (countTarget) countTarget.textContent = 'unavailable';
+      }
+
+      // 2) Built-in GoatCounter badge: useful as a comparison against the JSON result.
+      try {
+        if (window.goatcounter.visit_count) {
+          window.goatcounter.visit_count({
+            append: '#visitorBadge',
+            path: path,
+            no_branding: true
+          });
+        }
+      } catch (error) {
+        var badgeTarget = document.getElementById('visitorBadge');
+        if (badgeTarget) badgeTarget.textContent = 'unavailable';
       }
     }
   </script>
