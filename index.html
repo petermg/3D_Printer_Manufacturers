@@ -170,9 +170,13 @@
     <section class="wrap section" id="details">
       <h2>Full contact directory</h2>
       <p>These entries come from the companion contact directory and include source links. Contact details can change; verify before major outreach.</p>
-      <div id="contactDetails" class="details"></div>
+      <div id="contactDetails" class="details"><p class="small">Loading contact directory…</p></div>
     </section>
   </main>
+
+  <section class="wrap visitor-count-section hidden" id="visitorCountSection" aria-label="Site page view count">
+    <p class="visitor-count">Page views: <span id="visitorCount"></span></p>
+  </section>
 
   <footer class="footer">
     <div class="wrap">
@@ -182,5 +186,25 @@
 
   <script src="contacts.js"></script>
   <script src="script.js"></script>
+
+  <!-- Optional public page-view counter powered by GoatCounter.
+       It is hidden unless GoatCounter loads successfully, so it will not stall the visible page. -->
+  <script>
+    function showGoatCounterTotal() {
+      var section = document.getElementById('visitorCountSection');
+      var count = document.getElementById('visitorCount');
+      if (!section || !count || !window.goatcounter || !window.goatcounter.visit_count) return;
+      section.classList.remove('hidden');
+      count.textContent = '';
+      window.goatcounter.visit_count({
+        append: '#visitorCount',
+        path: 'TOTAL',
+        no_branding: true
+      });
+    }
+  </script>
+  <script data-goatcounter="https://petermg.goatcounter.com/count"
+          async src="https://gc.zgo.at/count.js"
+          onload="showGoatCounterTotal()"></script>
 </body>
 </html>
