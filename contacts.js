@@ -747,6 +747,20 @@ window.AB2047_CONTACTS = [
         "outreachScore": 110
       },
       {
+        "department": "Marketing",
+        "emails": [
+          "marketing@snapmaker.com"
+        ],
+        "emailText": "marketing@snapmaker.com",
+        "phone": "",
+        "region": "Global",
+        "notes": "Provided by Snapmaker in direct response to outreach; not yet verified on a public contact page.",
+        "confidence": "Medium",
+        "sourceLabel": "Direct company response",
+        "sourceUrl": "",
+        "outreachScore": 180
+      },
+      {
         "department": "YouTube / TikTok influencers / affiliate",
         "emails": [
           "affiliate@snapmaker.com"
@@ -790,9 +804,9 @@ window.AB2047_CONTACTS = [
       }
     ],
     "suggestedEmails": [
+      "marketing@snapmaker.com",
       "social@snapmaker.com",
-      "press@snapmaker.com",
-      "info@snapmaker.com"
+      "press@snapmaker.com"
     ],
     "hasDirectEmail": true,
     "hasContactForm": true

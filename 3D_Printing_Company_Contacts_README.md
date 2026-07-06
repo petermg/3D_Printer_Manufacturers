@@ -11,12 +11,12 @@ This README-style directory lists public contact paths for major 3D printing man
 | Metric | Count |
 |---|---:|
 | Companies included | 46 |
-| Contact rows | 189 |
-| Rows with direct email | 143 |
+| Contact rows | 190 |
+| Rows with direct email | 144 |
 | Rows with phone/other direct contact | 80 |
 | Rows routed through form/chat or web flow | 20 |
 | High confidence rows | 184 |
-| Medium confidence rows | 4 |
+| Medium confidence rows | 5 |
 | Low confidence rows | 1 |
 | Rows sourced from official pages/releases/manuals | 188 |
 
@@ -51,7 +51,7 @@ This README-style directory lists public contact paths for major 3D printing man
 | Consumer / prosumer FDM | 24 |
 | Consumer / prosumer FDM/resin | 23 |
 | Consumer / prosumer delta FDM | 6 |
-| Consumer / prosumer modular FDM/CNC/laser | 6 |
+| Consumer / prosumer modular FDM/CNC/laser | 7 |
 | Consumer / prosumer private-label 3D printers | 2 |
 | Consumer / prosumer resin | 7 |
 | Consumer / prosumer resin/FDM | 3 |
@@ -201,13 +201,14 @@ This README-style directory lists public contact paths for major 3D printing man
 ### Snapmaker
 
 **Market segment:** Consumer / prosumer modular FDM/CNC/laser  
-**Rows:** 6
+**Rows:** 7
 
 | Department / purpose | Email address(es) | Phone / other direct contact | Region | Notes | Confidence | Source |
 |---|---|---|---|---|---|---|
 | Pre-sales / logistics / general | `info@snapmaker.com` | — | Global | Official contact page. | High | [Official company page](https://www.snapmaker.com/pages/contact-us) |
 | Technical support | `support@snapmaker.com` | — | Global | Official contact page. | High | [Official company page](https://www.snapmaker.com/pages/contact-us) |
 | News / media / events | `press@snapmaker.com` | — | Global | Official contact/cooperation page. | High | [Official company page](https://www.snapmaker.com/pages/contact-us) |
+| Marketing | `marketing@snapmaker.com` | — | Global | Provided by Snapmaker in direct response to outreach; not yet verified on a public contact page. | Medium | Direct company response |
 | YouTube / TikTok influencers / affiliate | `affiliate@snapmaker.com` | — | Global | Official cooperation/affiliate pages. | High | [Official company page](https://www.snapmaker.com/pages/cooperation) |
 | Social media content partner | `social@snapmaker.com` | — | Global | Official cooperation page. | High | [Official company page](https://www.snapmaker.com/pages/cooperation) |
 | Community | `community@snapmaker.com` | — | Global | Official community challenge page. | High | [Official company page](https://www.snapmaker.com/pages/community) |

@@ -21,7 +21,9 @@ Always verify current bill status and text before publishing, campaigning, or se
 
 Company contact data was generated from `3D_Printing_Company_Contacts_README.md`, which was compiled from public contact paths for major 3D printing manufacturers and ecosystem companies. It prioritizes official company pages, official support pages, official press/media pages, official manuals, and official press releases.
 
-The site includes source links for each entry in the full contact directory.
+The site includes source links for each entry in the full contact directory when a public source URL is available.
+
+One Snapmaker marketing contact (`marketing@snapmaker.com`) was added from a direct company response to outreach rather than a public source page; it is marked Medium confidence and should be re-verified before major use.
 
 ## Outreach principle
 
