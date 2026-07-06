@@ -175,9 +175,13 @@
   </main>
 
   <section class="wrap visitor-count-section" id="visitorCounterSection" aria-label="Site page view count" hidden>
-    <p class="visitor-count">JSON page views: <span id="visitorCount"></span></p>
-    <p class="visitor-count visitor-count-diagnostic">GoatCounter badge: <span id="visitorBadge"></span></p>
-    <p class="visitor-count-note">Diagnostic mode: if both counters lag, GoatCounter is likely caching the public counter. If only one lags, the issue is probably path or counter-method related.</p>
+    <p class="visitor-count"><strong>Counter diagnostic</strong></p>
+    <p class="visitor-count">Tracked path from GoatCounter: <code id="gcPath">loading…</code></p>
+    <p class="visitor-count">Browser path: <code id="browserPath">loading…</code></p>
+    <div class="counter-diagnostic-box" id="jsonDiagnostics"></div>
+    <p class="visitor-count visitor-count-diagnostic">Built-in badge, default path: <span id="visitorBadgeDefault"></span></p>
+    <p class="visitor-count visitor-count-diagnostic">Built-in badge, tracked path: <span id="visitorBadgeTracked"></span></p>
+    <p class="visitor-count-note">Temporary diagnostic mode. This checks several possible GoatCounter paths so we can see whether the mismatch is path-related or public-counter caching.</p>
   </section>
 
   <footer class="footer">
@@ -190,57 +194,89 @@
   <script src="script.js"></script>
 
   <!-- Diagnostic public page-view counters powered by GoatCounter.
-       Shows both the JSON count and GoatCounter's built-in HTML badge side-by-side.
-       Use temporarily for troubleshooting, then remove the badge once the path/cache issue is understood. -->
+       Temporary troubleshooting mode: compares JSON counts for multiple possible paths
+       and the built-in GoatCounter badge counts. -->
   <script>
+    function uniquePaths(paths) {
+      var out = [];
+      paths.forEach(function(path) {
+        if (!path) return;
+        if (!out.includes(path)) out.push(path);
+      });
+      return out;
+    }
+
+    function stripTrailingSlash(path) {
+      if (!path || path === '/') return path;
+      return path.replace(/\/+$/, '');
+    }
+
+    function addTrailingSlash(path) {
+      if (!path || path.endsWith('/')) return path;
+      return path + '/';
+    }
+
+    async function fetchGoatCounterJson(path) {
+      var url = 'https://petermg.goatcounter.com/counter/' + encodeURIComponent(path) + '.json?v=' + Date.now();
+      try {
+        var response = await fetch(url, { cache: 'no-store' });
+        if (!response.ok) return { path: path, status: response.status, count: 'HTTP ' + response.status, url: url };
+        var data = await response.json();
+        return { path: path, status: response.status, count: data && data.count !== undefined ? data.count : 'no count', url: url };
+      } catch (error) {
+        return { path: path, status: 'error', count: 'error', url: url };
+      }
+    }
+
+    function renderDiagnosticRows(rows) {
+      var box = document.getElementById('jsonDiagnostics');
+      if (!box) return;
+      box.innerHTML = '<table class="counter-diagnostic-table"><thead><tr><th>JSON path tested</th><th>Count returned</th><th>Status</th></tr></thead><tbody>' +
+        rows.map(function(row) {
+          return '<tr><td><code>' + row.path.replace(/[&<>"]/g, function(c) { return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]); }) + '</code></td><td><strong>' + row.count + '</strong></td><td>' + row.status + '</td></tr>';
+        }).join('') +
+        '</tbody></table>';
+    }
+
     async function showGoatCounter() {
       if (!window.goatcounter || !window.goatcounter.get_data) return;
 
       var section = document.getElementById('visitorCounterSection');
-      if (section) {
-        section.hidden = false;
-        section.title = 'Diagnostic mode: compares GoatCounter JSON count against GoatCounter built-in badge count.';
+      if (section) section.hidden = false;
+
+      var gcPath = '';
+      try { gcPath = window.goatcounter.get_data().p; } catch (error) { gcPath = ''; }
+      var browserPath = window.location.pathname;
+
+      var gcPathEl = document.getElementById('gcPath');
+      var browserPathEl = document.getElementById('browserPath');
+      if (gcPathEl) gcPathEl.textContent = gcPath || '(none)';
+      if (browserPathEl) browserPathEl.textContent = browserPath || '(none)';
+
+      var candidates = uniquePaths([
+        gcPath,
+        browserPath,
+        stripTrailingSlash(gcPath),
+        addTrailingSlash(gcPath),
+        stripTrailingSlash(browserPath),
+        addTrailingSlash(browserPath),
+        '/3D_Printer_Manufacturers',
+        '/3D_Printer_Manufacturers/',
+        'TOTAL'
+      ]);
+
+      var results = [];
+      for (var i = 0; i < candidates.length; i++) {
+        results.push(await fetchGoatCounterJson(candidates[i]));
       }
+      renderDiagnosticRows(results);
 
-      var path;
-      try {
-        // Exact path GoatCounter records for this page.
-        path = window.goatcounter.get_data().p;
-      } catch (error) {
-        path = window.location.pathname;
-      }
-
-      // 1) JSON counter: site-controlled styling.
-      try {
-        var counterUrl =
-          'https://petermg.goatcounter.com/counter/' + encodeURIComponent(path) + '.json?v=' + Date.now();
-
-        var response = await fetch(counterUrl, { cache: 'no-store' });
-        if (response.ok) {
-          var data = await response.json();
-          if (data && typeof data.count !== 'undefined') {
-            var countTarget = document.getElementById('visitorCount');
-            if (countTarget) countTarget.textContent = data.count;
-          }
-        }
-      } catch (error) {
-        var countTarget = document.getElementById('visitorCount');
-        if (countTarget) countTarget.textContent = 'unavailable';
-      }
-
-      // 2) Built-in GoatCounter badge: useful as a comparison against the JSON result.
       try {
         if (window.goatcounter.visit_count) {
-          window.goatcounter.visit_count({
-            append: '#visitorBadge',
-            path: path,
-            no_branding: true
-          });
+          window.goatcounter.visit_count({ append: '#visitorBadgeDefault', no_branding: true });
+          if (gcPath) window.goatcounter.visit_count({ append: '#visitorBadgeTracked', path: gcPath, no_branding: true });
         }
-      } catch (error) {
-        var badgeTarget = document.getElementById('visitorBadge');
-        if (badgeTarget) badgeTarget.textContent = 'unavailable';
-      }
+      } catch (error) {}
     }
   </script>
   <script data-goatcounter="https://petermg.goatcounter.com/count"

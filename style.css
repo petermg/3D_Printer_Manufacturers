@@ -234,14 +234,37 @@ button.pill {
 body.modal-open { overflow: hidden; }
 
 
-/* Temporary GoatCounter diagnostic counter text. */
-.visitor-count-diagnostic {
-  margin-top: 0.4rem;
+/* Temporary GoatCounter diagnostic table. */
+.counter-diagnostic-box {
+  width: min(760px, 100%);
+  margin: 12px auto;
+  overflow-x: auto;
+}
+
+.counter-diagnostic-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.counter-diagnostic-table th,
+.counter-diagnostic-table td {
+  border-top: 1px solid var(--line);
+  padding: 8px 10px;
+  text-align: left;
+}
+
+.counter-diagnostic-table code,
+.visitor-count code {
+  background: rgba(255,255,255,0.08);
+  border-radius: 6px;
+  padding: 2px 5px;
 }
 
 .visitor-count-note {
   text-align: center;
   color: var(--muted);
-  font-size: 0.82rem;
-  margin: 0.4rem 0 0;
+  font-size: 0.85rem;
+  margin: 8px auto 0;
+  max-width: 900px;
 }
