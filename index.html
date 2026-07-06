@@ -188,13 +188,14 @@
   <script src="script.js"></script>
 
   <!-- Optional public page-view counter powered by GoatCounter.
-       It is hidden unless GoatCounter returns a count, so it will not stall the visible page. -->
+       This uses GoatCounter's JSON counter endpoint so the site controls the styling.
+       Note: GoatCounter public counter responses may be cached for several hours. -->
   <script>
     async function showGoatCounter() {
       if (!window.goatcounter || !window.goatcounter.get_data) return;
 
       try {
-        // Use GoatCounter's own path detection so the counter matches the dashboard path.
+        // Match the same path GoatCounter records in the dashboard.
         var path = window.goatcounter.get_data().p;
 
         var response = await fetch(
@@ -211,7 +212,10 @@
         var section = document.getElementById('visitorCounterSection');
 
         if (countTarget) countTarget.textContent = data.count;
-        if (section) section.hidden = false;
+        if (section) {
+          section.hidden = false;
+          section.title = 'Public counter may lag behind the GoatCounter dashboard because GoatCounter caches counter responses.';
+        }
       } catch (error) {
         // Fail silently. The counter is optional and should never make the page look broken.
       }
@@ -220,6 +224,6 @@
   <script data-goatcounter="https://petermg.goatcounter.com/count"
           async
           onload="showGoatCounter()"
-          src="//gc.zgo.at/count.js"></script>		  
+          src="//gc.zgo.at/count.js"></script>
 </body>
 </html>
