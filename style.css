@@ -232,21 +232,3 @@ button.pill {
 }
 .email-choice-actions { margin: 16px 0 12px; }
 body.modal-open { overflow: hidden; }
-
-/* Make GoatCounter's inserted page-view badge match the site. */
-#visitorCount,
-#visitorCount * {
-  display: inline !important;
-  background: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
-  color: var(--text) !important;
-  font: inherit !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  text-decoration: none !important;
-}
-
-#visitorCount {
-  font-weight: 800;
-}
