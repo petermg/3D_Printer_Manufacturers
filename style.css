@@ -126,6 +126,22 @@ summary { cursor: pointer; font-weight: 900; }
 table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 0.92rem; }
 th, td { border-top: 1px solid var(--line); padding: 9px; text-align: left; vertical-align: top; }
 th { color: var(--accent); }
+
+/* Small public page-view counter near the footer. */
+.visitor-count-section {
+  padding: 0 0 1.5rem;
+}
+.visitor-count {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin: 0;
+}
+.visitor-count span {
+  font-weight: 800;
+  color: var(--text);
+}
+
 .footer { padding: 36px 0; color: var(--muted); border-top: 1px solid var(--line); }
 .hidden { display: none !important; }
 @media (max-width: 900px) {
@@ -216,3 +232,21 @@ button.pill {
 }
 .email-choice-actions { margin: 16px 0 12px; }
 body.modal-open { overflow: hidden; }
+
+/* Make GoatCounter's inserted page-view badge match the site. */
+#visitorCount,
+#visitorCount * {
+  display: inline !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  color: var(--text) !important;
+  font: inherit !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  text-decoration: none !important;
+}
+
+#visitorCount {
+  font-weight: 800;
+}
