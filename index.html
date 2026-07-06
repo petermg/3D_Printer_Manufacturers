@@ -189,22 +189,51 @@
 
   <!-- Optional public page-view counter powered by GoatCounter.
        It is hidden unless GoatCounter loads successfully, so it will not stall the visible page. -->
-  <script>
-    function showGoatCounterTotal() {
-      var section = document.getElementById('visitorCountSection');
-      var count = document.getElementById('visitorCount');
-      if (!section || !count || !window.goatcounter || !window.goatcounter.visit_count) return;
-      section.classList.remove('hidden');
-      count.textContent = '';
-      window.goatcounter.visit_count({
-        append: '#visitorCount',
-        no_branding: true
-      });
-    }
-  </script>
-  
-  <script data-goatcounter="https://petermg.goatcounter.com/count"
-          async src="https://gc.zgo.at/count.js"
-          onload="showGoatCounterTotal()"></script>
+<script>
+  function showGoatCounter() {
+    if (!window.goatcounter || !window.goatcounter.visit_count) return;
+
+    var section = document.getElementById('visitorCounterSection');
+    if (section) section.hidden = false;
+
+    window.goatcounter.visit_count({
+      append: '#visitorCount',
+      no_branding: true,
+      style: `
+        #gcvc-border {
+          display: inline !important;
+          border: 0 !important;
+          background: transparent !important;
+          color: inherit !important;
+          padding: 0 !important;
+          margin: 0 !important;
+          width: auto !important;
+          height: auto !important;
+          min-width: 0 !important;
+          min-height: 0 !important;
+        }
+
+        #gcvc-for,
+        #gcvc-by {
+          display: none !important;
+        }
+
+        #gcvc-views {
+          display: inline !important;
+          color: inherit !important;
+          font: inherit !important;
+          font-weight: 800 !important;
+          line-height: inherit !important;
+          padding: 0 !important;
+          margin: 0 !important;
+        }
+      `
+    });
+  }
+</script>
+<script data-goatcounter="https://petermg.goatcounter.com/count"
+        async
+        onload="showGoatCounter()"
+        src="//gc.zgo.at/count.js"></script>		  
 </body>
 </html>
