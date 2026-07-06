@@ -78,7 +78,7 @@ function companyDetailId(company) {
 }
 
 function emailLinks(emails, company) {
-  return emails.map(email => `<button class="inline-email" type="button" data-email-to="${escapeHtml(email)}" data-company-slug="${escapeHtml(company.slug)}" title="Choose email app or Gmail for ${escapeHtml(email)}">${escapeHtml(email)}</button>`).join(', ');
+  return emails.map(email => `<button class="inline-email" type="button" data-email-to="${escapeHtml(email)}" data-company-slug="${escapeHtml(company.slug)}" title="Choose email app or Gmail in browser for ${escapeHtml(email)}">${escapeHtml(email)}</button>`).join(', ');
 }
 
 function renderSegments() {
@@ -118,7 +118,7 @@ function renderCompanies() {
         <label class="company-title"><input type="checkbox" data-company="${company.slug}" ${selected.has(company.slug) ? 'checked' : ''}/><span><span class="company-name">${escapeHtml(company.name)}</span><br><span class="small">${escapeHtml(company.segment)}</span></span></label>
       </div>
       <div class="pills">
-        ${emails.length ? `<button class="pill good pill-button" type="button" data-email-to="${escapeHtml(emails.join(','))}" data-company-slug="${escapeHtml(company.slug)}" title="Choose email app or Gmail for ${escapeHtml(company.name)}">Email this company</button>` : `<span class="pill warn">No direct public email</span>`}
+        ${emails.length ? `<button class="pill good pill-button" type="button" data-email-to="${escapeHtml(emails.join(','))}" data-company-slug="${escapeHtml(company.slug)}" title="Choose email app or Gmail in browser for ${escapeHtml(company.name)}">Email this company</button>` : `<span class="pill warn">No direct public email</span>`}
         ${form ? `<a class="pill pill-link" href="${escapeHtml(form)}" target="_blank" rel="noopener" title="Open ${escapeHtml(company.name)} contact/source page">Company contact page</a>` : ''}
         ${moreContacts ? `<a class="pill pill-link" href="#${companyDetailId(company)}" title="Jump to the full directory entry for ${escapeHtml(company.name)}">More contact options</a>` : ''}
       </div>
@@ -198,7 +198,7 @@ function ensureEmailChooser() {
       <div class="email-choice-recipients" id="emailChoiceRecipients"></div>
       <div class="draft-actions email-choice-actions">
         <a class="button primary" id="emailChoiceApp" href="#">Open email app draft</a>
-        <a class="button gmail" id="emailChoiceGmail" href="#" target="_blank" rel="noopener">Open Gmail draft</a>
+        <a class="button gmail" id="emailChoiceGmail" href="#" target="_blank" rel="noopener">Open Gmail in browser</a>
         <button class="button secondary" id="emailChoiceCopy" type="button">Copy email address</button>
       </div>
       <p class="small">The draft uses the message and template currently shown on this page. Nothing is sent automatically.</p>
@@ -258,7 +258,7 @@ function renderDrafts() {
         <p class="draft-to"><strong>To:</strong> ${escapeHtml(to)}</p>
         <div class="draft-actions">
           <a class="button primary" href="${mailtoUrl(to, company)}">Open email app draft</a>
-          <a class="button gmail" href="${gmailComposeUrl(to, company)}" target="_blank" rel="noopener">Open Gmail draft</a>
+          <a class="button gmail" href="${gmailComposeUrl(to, company)}" target="_blank" rel="noopener">Open Gmail in browser</a>
           <button class="button secondary" data-copy-company="${company.slug}" type="button">Copy body</button>
           ${form ? `<a class="button ghost" href="${escapeHtml(form)}" target="_blank" rel="noopener">Open company contact page</a>` : ''}
         </div>`;
